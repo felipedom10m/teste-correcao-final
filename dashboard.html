@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>teste-correcao-final - Área do Aluno</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #141414;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .member-dashboard {
+            min-height: 100vh;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .course-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-name {
+            color: #cccccc;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #b8070f;
+        }
+        
+        .dashboard-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 300px));
+            gap: 24px;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+        
+        /* Responsividade completa */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 280px));
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+        
+        .module-card {
+            background: #1f1f1f;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+            border-color: #333;
+        }
+        
+        .module-cover {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .module-icon {
+            font-size: 48px;
+            opacity: 0.9;
+            transition: transform 0.3s ease;
+        }
+        
+        .module-card:hover .module-icon {
+            transform: scale(1.1);
+        }
+        
+        .module-info {
+            padding: 20px;
+        }
+        
+        .module-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .module-stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: #333;
+            color: #ccc;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .support-section {
+            background: #1f1f1f;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        
+        .support-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+        
+        .support-text {
+            color: #cccccc;
+            margin-bottom: 20px;
+        }
+        
+        .support-contacts {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .support-contact {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cccccc;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #999;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        /* Modal de mídia */
+        .media-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .media-modal-content {
+            background: #1f1f1f;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            transform: scale(0.8);
+            animation: modalIn 0.3s ease forwards;
+        }
+        
+        @keyframes modalIn {
+            to { transform: scale(1); }
+        }
+        
+        .media-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .media-modal-header h3 {
+            color: #ffffff;
+            font-size: 18px;
+            margin: 0;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: #fff;
+        }
+        
+        .media-modal-body {
+            padding: 20px;
+        }
+        
+        .media-modal-body video {
+            width: 100%;
+            border-radius: 8px;
+            background: #000;
+        }
+        
+        .media-modal-body iframe {
+            width: 100%;
+            border-radius: 8px;
+            background: #fff;
+        }
+        
+        .media-modal-footer {
+            padding: 20px;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .modal-btn.primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .modal-btn.primary:hover {
+            background: #0056b3;
+        }
+        
+        .modal-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .modal-btn.secondary:hover {
+            background: #545b62;
+        }
+        
+        /* Responsividade modal */
+        @media (max-width: 768px) {
+            .media-modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+            
+            .media-modal-header,
+            .media-modal-body,
+            .media-modal-footer {
+                padding: 15px;
+            }
+            
+            .media-modal-body iframe {
+                height: 400px;
+            }
+            
+            .modal-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            
+            .course-title {
+                font-size: 24px;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .dashboard-content {
+                padding: 30px 15px;
+            }
+            
+            .support-contacts {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="member-dashboard">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="course-title">🎓 teste-correcao-final</h1>
+                <div class="user-info">
+                    <span class="user-name">👤 Aluno</span>
+                    <button class="logout-btn" onclick="logout()">🚪 Sair</button>
+                </div>
+            </div>
+        </header>
+        
+        <main class="dashboard-content">
+            <h2 class="section-title">📚 Conteúdo do Curso</h2>
+            
+            <div class="content-grid">
+                
+    <div class="module-card" onclick="openModule('MentalidaGuerreiro111')">
+      <div class="module-cover" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+        <div class="module-icon">📖</div>
+      </div>
+      <div class="module-info">
+        <h3 class="module-title">MentalidaGuerreiro111</h3>
+        <div class="module-stats">
+          <span class="stat">🎥 2</span>
+          
+        </div>
+      </div>
+    </div>
+                
+            </div>
+            
+            
+            
+            <div class="support-section">
+                <h3 class="support-title">💬 Suporte</h3>
+                <p class="support-text">Precisa de ajuda? Entre em contato conosco:</p>
+                <div class="support-contacts">
+                    <div class="support-contact">
+                        <span>📧</span>
+                        <span>suporte@seusite.com</span>
+                    </div>
+                    <div class="support-contact">
+                        <span>📱</span>
+                        <span>WhatsApp: (11) 99999-9999</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Verificar autenticação
+        if (!localStorage.getItem('memberAuth')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Dados dos módulos para navegação
+        const moduleData = {"MentalidaGuerreiro111":[{"name":"emag.mp4","path":"MentalidaGuerreiro111/emag.mp4","type":"video"},{"name":"emagrecim1.mp4","path":"MentalidaGuerreiro111/emagrecim1.mp4","type":"video"}]};
+        const extraData = [];
+        
+        function openModule(moduleName) {
+            const files = moduleData[moduleName];
+            if (!files || files.length === 0) return;
+            
+            // Criar página de módulo dinamicamente
+            const moduleHTML = generateModulePage(moduleName, files);
+            document.body.innerHTML = moduleHTML;
+        }
+        
+        function openFile(filePath) {
+            const fileName = filePath.split('/').pop();
+            const fileExt = fileName.split('.').pop().toLowerCase();
+            
+            if (['mp4', 'mov', 'avi', 'mkv', 'wmv'].includes(fileExt)) {
+                showVideoModal(filePath, fileName);
+            } else if (fileExt === 'pdf') {
+                showPDFModal(filePath, fileName);
+            } else {
+                // Fallback para outros tipos
+                const fileUrl = filePath;
+                window.open(fileUrl, '_blank');
+            }
+        }
+        
+        function showVideoModal(filePath, fileName) {
+            const modal = document.createElement('div');
+            modal.className = 'media-modal';
+            modal.innerHTML = `
+                <div class="media-modal-content">
+                    <div class="media-modal-header">
+                        <h3>🎥 ${fileName}</h3>
+                        <button class="close-modal" onclick="closeModal(this)">&times;</button>
+                    </div>
+                    <div class="media-modal-body">
+                        <video controls width="100%" preload="metadata">
+                            <source src="${filePath}" type="video/mp4">
+                            Seu navegador não suporta reprodução de vídeo.
+                        </video>
+                    </div>
+                    <div class="media-modal-footer">
+                        <button class="modal-btn secondary" onclick="closeModal(this)">Fechar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Fechar modal ao clicar fora
+            modal.onclick = function(e) {
+                if (e.target === modal) closeModal(modal.querySelector('.close-modal'));
+            };
+        }
+        
+        function showPDFModal(filePath, fileName) {
+            const modal = document.createElement('div');
+            modal.className = 'media-modal';
+            modal.innerHTML = `
+                <div class="media-modal-content">
+                    <div class="media-modal-header">
+                        <h3>📄 ${fileName}</h3>
+                        <button class="close-modal" onclick="closeModal(this)">&times;</button>
+                    </div>
+                    <div class="media-modal-body">
+                        <iframe src="${filePath}" width="100%" height="600px" frameborder="0">
+                            Seu navegador não suporta visualização de PDF.
+                        </iframe>
+                    </div>
+                    <div class="media-modal-footer">
+                        <button class="modal-btn primary" onclick="downloadFile('${filePath}', '${fileName}')">
+                            📥 Download
+                        </button>
+                        <button class="modal-btn secondary" onclick="closeModal(this)">Fechar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Fechar modal ao clicar fora
+            modal.onclick = function(e) {
+                if (e.target === modal) closeModal(modal.querySelector('.close-modal'));
+            };
+        }
+        
+        function downloadFile(filePath, fileName) {
+            const link = document.createElement('a');
+            link.href = filePath;
+            link.download = fileName;
+            link.click();
+        }
+        
+        function closeModal(element) {
+            const modal = element.closest('.media-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        function generateModulePage(moduleName, files) {
+            const moduleTitle = moduleName.replace(/[-_]/g, ' ').replace(/w/g, l => l.toUpperCase());
+            
+            const filesList = files.map(file => `
+                <div class="file-item" onclick="openFile('${file.path}')">
+                    <div class="file-icon">${file.type === 'video' ? '🎥' : '📄'}</div>
+                    <div class="file-info">
+                        <h4 class="file-name">${file.name}</h4>
+                        <p class="file-type">${file.type === 'video' ? 'Vídeo' : 'Documento'}</p>
+                    </div>
+                    <div class="file-action">
+                        <button class="download-btn">📥 Abrir</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            return `
+                <div class="member-dashboard">
+                    <header class="dashboard-header">
+                        <div class="header-content">
+                            <h1 class="course-title">📖 ${moduleTitle}</h1>
+                            <div class="user-info">
+                                <button class="logout-btn" onclick="goBack()">← Voltar</button>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <main class="dashboard-content">
+                        <h2 class="section-title">🎥 Arquivos deste módulo</h2>
+                        
+                        <div class="files-list">
+                            ${filesList}
+                        </div>
+                        
+                        <div class="support-section">
+                            <h3 class="support-title">💬 Suporte</h3>
+                            <p class="support-text">Precisa de ajuda? Entre em contato conosco:</p>
+                            <div class="support-contacts">
+                                <div class="support-contact">
+                                    <span>📧</span>
+                                    <span>suporte@seusite.com</span>
+                                </div>
+                                <div class="support-contact">
+                                    <span>📱</span>
+                                    <span>WhatsApp: (11) 99999-9999</span>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+                
+                <style>
+                    .files-list {
+                        background: #1f1f1f;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin-bottom: 30px;
+                    }
+                    
+                    .file-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 16px;
+                        padding: 16px;
+                        background: #2a2a2a;
+                        border-radius: 8px;
+                        margin-bottom: 12px;
+                        cursor: pointer;
+                        transition: background 0.3s;
+                    }
+                    
+                    .file-item:hover {
+                        background: #333;
+                    }
+                    
+                    .file-icon {
+                        font-size: 24px;
+                        width: 40px;
+                        text-align: center;
+                    }
+                    
+                    .file-info {
+                        flex: 1;
+                    }
+                    
+                    .file-name {
+                        font-size: 16px;
+                        font-weight: 500;
+                        color: #ffffff;
+                        margin-bottom: 4px;
+                    }
+                    
+                    .file-type {
+                        font-size: 14px;
+                        color: #ccc;
+                    }
+                    
+                    .download-btn {
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: background 0.3s;
+                    }
+                    
+                    .download-btn:hover {
+                        background: #0056b3;
+                    }
+                </style>
+            `;
+        }
+        
+        function goBack() {
+            window.location.reload();
+        }
+        
+        function logout() {
+            localStorage.removeItem('memberAuth');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
